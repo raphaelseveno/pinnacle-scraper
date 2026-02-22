@@ -1,0 +1,111 @@
+# Project Acheron Configuration
+# Edit this file with your credentials and preferences
+
+# Pinnacle Account (REQUIRED)
+pinnacle:
+  username: "YOUR_PINNACLE_USERNAME"  # Replace with your PS3838 username
+  password: "YOUR_PINNACLE_PASSWORD"  # Replace with your PS3838 password
+  base_url: "https://www.ps3838.com"
+  websocket_url: "wss://push.ps3838.com"  # Will be auto-detected during auth
+
+# Proxy Configuration
+proxy:
+  provider: "packetstream"  # Options: packetstream, webshare, custom
+  api_key: "YOUR_PACKETSTREAM_API_KEY"  # Get from https://packetstream.io
+  use_proxy_for:
+    - "authentication"  # Use proxy for login (REQUIRED for residential IP)
+    # - "websocket"  # Uncomment if datacenter IP gets blocked
+  rotation_enabled: true  # Rotate proxy IPs on session refresh
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null  # Set if using password-protected Redis
+
+# Notification Configuration
+notifications:
+  provider: "ntfy"
+  ntfy:
+    topic: "acheron-alerts-YOUR_SECRET"  # Replace with unique topic name
+    server: "https://ntfy.sh"
+    priority: 5  # Critical priority (1-5, 5 = highest)
+    tags: "moneybag,chart_with_upwards_trend"
+
+  # Alert Thresholds
+  thresholds:
+    min_profit_percent: 2.0  # Only alert if arb profit >= 2%
+    min_bet_limit: 500  # Only alert if max bet >= $500
+    cooldown_seconds: 10  # Prevent duplicate alerts within 10s
+
+# Hockey/NHL Specific Configuration
+sports:
+  focus: "hockey"  # Primary sport to monitor
+  leagues:
+    - "NHL"  # National Hockey League
+    # - "KHL"  # Kontinental Hockey League
+    # - "AHL"  # American Hockey League
+
+  markets:
+    - "moneyline"  # Game winner (1X2)
+    - "puckline"   # Handicap (spread)
+    - "totals"     # Over/Under
+    # - "period_betting"  # Exclude to save bandwidth
+    # - "props"  # Exclude to save bandwidth
+
+  game_states:
+    - "live"       # In-play games (highest priority)
+    - "upcoming"   # Pre-game markets
+
+  # Bandwidth Optimization
+  update_frequency:
+    live: 1  # Seconds between updates for live games
+    upcoming: 5  # Seconds for pre-game markets
+
+# Stealth & Anti-Detection
+stealth:
+  browser:
+    headless: true  # Run browser in headless mode
+    user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    viewport:
+      width: 1920
+      height: 1080
+
+  timing:
+    min_delay_ms: 50   # Minimum delay between actions (human-like)
+    max_delay_ms: 500  # Maximum delay
+    session_duration_min: 25  # Re-auth before 30min cookie expiry
+
+  captcha:
+    auto_solve: true
+    solver: "nodriver"  # Options: nodriver, nopecha
+    nopecha_api_key: null  # Optional: set for fallback CAPTCHA solving
+
+# System Health & Monitoring
+monitoring:
+  health_check_interval: 60  # Seconds between health checks
+  websocket_timeout: 300  # Reconnect if no message for 5 minutes
+  max_reconnect_attempts: 10
+  reconnect_backoff_base: 2  # Exponential backoff multiplier
+
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    file: "/var/log/acheron/acheron.log"
+    max_size_mb: 100
+    backup_count: 5
+
+# Advanced Configuration
+advanced:
+  # Enable delta compression (only send changed values)
+  delta_updates: true
+
+  # Store odds history for analysis
+  historical_data:
+    enabled: false
+    retention_days: 7
+
+  # Multi-account support (for redundancy)
+  failover_accounts: []
+    # - username: "backup_account"
+    #   password: "backup_password"

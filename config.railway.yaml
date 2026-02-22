@@ -1,0 +1,100 @@
+# Project Acheron Configuration for Railway.app
+# Environment variables are injected by Railway at runtime
+
+# Pinnacle Account (set via Railway environment variables)
+pinnacle:
+  username: "${PINNACLE_USERNAME}"
+  password: "${PINNACLE_PASSWORD}"
+  base_url: "https://www.ps3838.com"
+  websocket_url: "wss://push.ps3838.com"
+
+# Proxy Configuration (set via Railway environment variables)
+proxy:
+  provider: "packetstream"
+  api_key: "${PACKETSTREAM_API_KEY}"
+  use_proxy_for:
+    - "authentication"
+  rotation_enabled: true
+
+# Redis Configuration (Railway internal network)
+redis:
+  host: "${REDIS_HOST:-redis.railway.internal}"
+  port: ${REDIS_PORT:-6379}
+  db: 0
+  password: "${REDIS_PASSWORD}"
+
+# Notification Configuration
+notifications:
+  provider: "ntfy"
+  ntfy:
+    topic: "${NTFY_TOPIC}"
+    server: "https://ntfy.sh"
+    priority: 5
+    tags: "moneybag,chart_with_upwards_trend"
+
+  # Alert Thresholds
+  thresholds:
+    min_profit_percent: 2.0
+    min_bet_limit: 500
+    cooldown_seconds: 10
+
+# Hockey/NHL Specific Configuration
+sports:
+  focus: "hockey"
+  leagues:
+    - "NHL"
+
+  markets:
+    - "moneyline"
+    - "puckline"
+    - "totals"
+
+  game_states:
+    - "live"
+    - "upcoming"
+
+  update_frequency:
+    live: 1
+    upcoming: 5
+
+# Stealth & Anti-Detection
+stealth:
+  browser:
+    headless: true
+    user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    viewport:
+      width: 1920
+      height: 1080
+
+  timing:
+    min_delay_ms: 50
+    max_delay_ms: 500
+    session_duration_min: 25
+
+  captcha:
+    auto_solve: true
+    solver: "nodriver"
+    nopecha_api_key: null
+
+# System Health & Monitoring
+monitoring:
+  health_check_interval: 60
+  websocket_timeout: 300
+  max_reconnect_attempts: 10
+  reconnect_backoff_base: 2
+
+  logging:
+    level: "INFO"
+    file: "/app/logs/acheron.log"
+    max_size_mb: 100
+    backup_count: 5
+
+# Advanced Configuration
+advanced:
+  delta_updates: true
+
+  historical_data:
+    enabled: false
+    retention_days: 7
+
+  failover_accounts: []

@@ -1,0 +1,45 @@
+# Project Acheron - Back4app Optimized Dockerfile
+# Optimized for 256MB RAM limit
+
+FROM python:3.11-slim
+
+# Install minimal dependencies for Nodriver
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY src/ /app/src/
+COPY lua/ /app/lua/
+COPY config.yaml /app/config.yaml
+
+# Create logs directory
+RUN mkdir -p /app/logs
+
+# Set environment variables
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROME_PATH=/usr/bin/chromium
+ENV PYTHONUNBUFFERED=1
+
+# Optimize Python memory
+ENV PYTHONMALLOC=malloc
+ENV MALLOC_TRIM_THRESHOLD_=100000
+
+# Non-root user
+RUN useradd -m -u 1000 acheron && \
+    chown -R acheron:acheron /app
+USER acheron
+
+# Expose port (if needed)
+EXPOSE 8080
+
+# Run application
+CMD ["python", "src/main.py"]

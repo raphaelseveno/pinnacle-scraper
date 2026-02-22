@@ -1,0 +1,34 @@
+version: '3.8'
+
+# Back4app deployment configuration
+# Uses external Upstash Redis (free tier) to save memory
+
+services:
+  acheron:
+    build:
+      context: .
+      dockerfile: Dockerfile.back4app
+    container_name: acheron-app
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Redis connection will use Upstash (set in config.yaml)
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    # Memory optimization for 256MB limit
+    deploy:
+      resources:
+        limits:
+          memory: 240M
+        reservations:
+          memory: 128M
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3

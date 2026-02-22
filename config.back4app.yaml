@@ -1,0 +1,114 @@
+# Project Acheron - Back4app Optimized Configuration
+# Optimized for 256MB RAM limit with external Upstash Redis
+
+# Pinnacle Account (REQUIRED)
+pinnacle:
+  username: "YOUR_PINNACLE_USERNAME"
+  password: "YOUR_PINNACLE_PASSWORD"
+  base_url: "https://www.ps3838.com"
+  websocket_url: "wss://push.ps3838.com"
+
+# Proxy Configuration
+proxy:
+  provider: "packetstream"
+  api_key: "YOUR_PACKETSTREAM_API_KEY"
+  use_proxy_for:
+    - "authentication"
+  rotation_enabled: true
+
+# Upstash Redis Configuration (External - Free Tier)
+redis:
+  host: "YOUR_UPSTASH_ENDPOINT.upstash.io"  # From Upstash dashboard
+  port: 6379  # Or 33816 if using TLS port
+  db: 0
+  password: "YOUR_UPSTASH_PASSWORD"  # From Upstash dashboard
+
+# Notification Configuration
+notifications:
+  provider: "ntfy"
+  ntfy:
+    topic: "acheron-alerts-YOUR_SECRET"
+    server: "https://ntfy.sh"
+    priority: 5
+    tags: "moneybag,chart_with_upwards_trend"
+
+  thresholds:
+    min_profit_percent: 2.0
+    min_bet_limit: 500
+    cooldown_seconds: 10
+
+# Hockey/NHL Configuration - MEMORY OPTIMIZED
+sports:
+  focus: "hockey"
+  leagues:
+    - "NHL"  # Only NHL to save memory
+
+  markets:
+    - "moneyline"  # Only moneyline to reduce memory usage
+    # Comment out puckline and totals to save memory:
+    # - "puckline"
+    # - "totals"
+
+  game_states:
+    - "live"  # Only live games to reduce processing
+    # Comment out upcoming to save memory:
+    # - "upcoming"
+
+  update_frequency:
+    live: 2  # Increased to 2s (from 1s) to reduce CPU load
+    upcoming: 10
+
+# Stealth & Anti-Detection - MEMORY OPTIMIZED
+stealth:
+  browser:
+    headless: true
+    user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    viewport:
+      width: 1280  # Reduced from 1920 to save memory
+      height: 720  # Reduced from 1080 to save memory
+    # Memory optimization
+    disable_dev_shm: true
+    single_process: true
+
+  timing:
+    min_delay_ms: 100  # Slightly increased to reduce CPU
+    max_delay_ms: 500
+    session_duration_min: 25
+
+  captcha:
+    auto_solve: true
+    solver: "nodriver"
+    nopecha_api_key: null
+
+# System Health & Monitoring - MEMORY OPTIMIZED
+monitoring:
+  health_check_interval: 120  # Increased from 60s to reduce overhead
+  websocket_timeout: 300
+  max_reconnect_attempts: 5  # Reduced from 10
+  reconnect_backoff_base: 2
+
+  logging:
+    level: "WARNING"  # Changed from INFO to reduce log overhead
+    file: "/app/logs/acheron.log"
+    max_size_mb: 10  # Reduced from 100MB
+    backup_count: 2  # Reduced from 5
+
+# Advanced Configuration - MEMORY OPTIMIZED
+advanced:
+  # Delta updates only (don't store full history)
+  delta_updates: true
+
+  # Historical data disabled to save memory
+  historical_data:
+    enabled: false
+    retention_days: 0
+
+  # Limit concurrent operations
+  max_concurrent_connections: 1
+  message_buffer_size: 50  # Limit in-memory message queue
+
+  # Memory optimization flags
+  gc_threshold: 500  # Run garbage collection more frequently
+  max_cached_events: 20  # Limit event cache size
+
+  failover_accounts: []

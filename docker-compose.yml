@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Redis database for odds storage and arbitrage detection
+  redis:
+    image: redis:7-alpine
+    container_name: acheron-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - acheron-network
+
+  # Project Acheron main application
+  acheron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: acheron-app
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./logs:/app/logs
+      - ./src:/app/src:ro
+      - ./lua:/app/lua:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    # Capabilities needed for Chrome/Chromium
+    cap_add:
+      - SYS_ADMIN
+    # Shared memory for Chrome
+    shm_size: 2gb
+    networks:
+      - acheron-network
+    # Resource limits (adjust based on your VPS)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  acheron-network:
+    driver: bridge

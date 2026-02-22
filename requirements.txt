@@ -1,0 +1,49 @@
+# Project Acheron - Python Dependencies
+
+# Browser Automation & Anti-Detection
+nodriver>=0.37
+camoufox>=0.4.0
+selenium-stealth>=1.0.6
+
+# Async & WebSocket
+aiohttp>=3.11.0
+websockets>=14.1
+asyncio>=3.4.3
+
+# HTTP Requests & Proxies
+requests>=2.32.0
+httpx>=0.28.0
+python-socks>=2.7.0
+
+# Data Processing
+pydantic>=2.10.0
+python-dateutil>=2.9.0
+
+# Redis & Caching
+redis>=5.2.1
+hiredis>=3.0.0  # C parser for Redis (faster)
+
+# Configuration
+pyyaml>=6.0.2
+python-dotenv>=1.0.1
+
+# Logging & Monitoring
+loguru>=0.7.3
+prometheus-client>=0.21.0  # Optional: metrics export
+
+# Notifications
+httpx>=0.28.0  # For ntfy.sh API calls
+
+# Utilities
+pytz>=2024.2  # Timezone handling
+tenacity>=9.0.0  # Retry logic with exponential backoff
+psutil>=6.1.0  # System monitoring
+
+# MCP Server
+fastmcp>=0.4.0  # Model Context Protocol server
+
+# Development & Testing (optional)
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+black>=24.10.0
+flake8>=7.1.0

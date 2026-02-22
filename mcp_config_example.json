@@ -1,0 +1,28 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/mcp-config.schema.json",
+  "mcpServers": {
+    "acheron-manager": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-http",
+        "https://your-app.railway.app"
+      ],
+      "env": {
+        "MCP_SERVER_URL": "https://your-app.railway.app"
+      },
+      "description": "Acheron NHL Arbitrage Scraper Management Server",
+      "metadata": {
+        "deployment": "railway",
+        "version": "1.0.0",
+        "capabilities": [
+          "scraper_control",
+          "config_management",
+          "log_viewing",
+          "alert_browsing",
+          "system_monitoring"
+        ]
+      }
+    }
+  }
+}
