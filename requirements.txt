@@ -41,6 +41,8 @@ psutil>=6.1.0  # System monitoring
 
 # MCP Server
 fastmcp>=0.4.0  # Model Context Protocol server
+fastapi>=0.115.0  # Web framework for MCP server
+uvicorn>=0.32.0  # ASGI server
 
 # Development & Testing (optional)
 pytest>=8.3.0

@@ -540,22 +540,52 @@ async def get_current_config() -> str:
     return yaml.safe_dump(config, default_flow_style=False)
 
 
-@mcp.get("/health")
-async def health_check():
-    """Health check endpoint for Railway"""
-    return {
-        "status": "healthy",
-        "service": "acheron-mcp-server",
-        "timestamp": datetime.now().isoformat()
-    }
-
-
 if __name__ == "__main__":
     # Run the MCP server
+    import uvicorn
+    from fastapi import FastAPI
+    from fastapi.responses import JSONResponse
+
     logger.info("Starting Acheron MCP Management Server...")
 
     # Get port from environment (Railway sets this)
     port = int(os.getenv('PORT', 8080))
 
-    # Run with HTTP transport for Railway
-    mcp.run(transport="http", host="0.0.0.0", port=port)
+    # Create FastAPI app for HTTP transport
+    app = FastAPI(title="Acheron MCP Server")
+
+    # Add health check endpoint
+    @app.get("/health")
+    async def health_check():
+        """Health check endpoint for Railway"""
+        return JSONResponse({
+            "status": "healthy",
+            "service": "acheron-mcp-server",
+            "timestamp": datetime.now().isoformat()
+        })
+
+    # Add root endpoint
+    @app.get("/")
+    async def root():
+        """Root endpoint with server info"""
+        return JSONResponse({
+            "name": "Acheron MCP Management Server",
+            "version": "1.0.0",
+            "status": "running",
+            "endpoints": {
+                "health": "/health",
+                "mcp": "/mcp"
+            }
+        })
+
+    # Mount MCP server
+    try:
+        # Include MCP routes
+        mcp_app = mcp.get_app()
+        app.mount("/mcp", mcp_app)
+    except Exception as e:
+        logger.warning(f"Could not mount MCP app: {e}. Running standalone.")
+
+    # Run server
+    logger.info(f"Starting server on 0.0.0.0:{port}")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

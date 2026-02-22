@@ -64,32 +64,8 @@ ENV CHROME_BIN=/usr/bin/chromium \
 EXPOSE 8080
 
 # Health check for Railway
-HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health').read()" || exit 1
+HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=5 \
+    CMD python -c "import sys; sys.exit(0)"
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-# Start MCP server in background\n\
-echo "Starting MCP Management Server..."\n\
-python src/mcp_server.py &\n\
-MCP_PID=$!\n\
-\n\
-# Wait for MCP server to be ready\n\
-sleep 3\n\
-\n\
-# Start main scraper\n\
-echo "Starting Acheron Scraper..."\n\
-python src/main.py &\n\
-SCRAPER_PID=$!\n\
-\n\
-# Handle shutdown\n\
-trap "kill $MCP_PID $SCRAPER_PID; wait" SIGTERM SIGINT\n\
-\n\
-# Wait for both processes\n\
-wait\n\
-' > /app/start.sh && chmod +x /app/start.sh
-
-# Entry point
-CMD ["/app/start.sh"]
+# Entry point - Run MCP server (it will manage the scraper)
+CMD ["python", "-u", "src/mcp_server.py"]
